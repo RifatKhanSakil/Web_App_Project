@@ -1,0 +1,8 @@
+{
+  "name": "cattle-farm-management-system-frontend",
+  "version": "1.0.0",
+  "description": "Frontend base setup for Cattle Farm Management System",
+  "private": true,
+  "author": "Md. Rifat Khan Sakil",
+  "license": "MIT"
+}
