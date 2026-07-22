@@ -1,0 +1,14 @@
+# Python
+backend/.env
+backend/__pycache__/
+backend/venv/
+
+# React
+frontend/node_modules/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+*.pyc
