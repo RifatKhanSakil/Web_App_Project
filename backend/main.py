@@ -1,21 +1,23 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from bson import ObjectId
 from fastapi.middleware.cors import CORSMiddleware
 from database import inquiries_collection
 
-class Inquiry(BaseModel):
-    name: str
-    phone: str
-    email: str
-    animal: str
-    purpose: str
-    visit_date: str
-    message: str
+
+# -----------------------------
+# FastAPI App Information
+# -----------------------------
+app = FastAPI(
+    title="Cattle Farm Management API",
+    description="Farm Visit & Animal Inquiry REST API",
+    version="1.0.0"
+)
 
 
-app = FastAPI()
-
+# -----------------------------
+# Enable CORS
+# -----------------------------
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -27,33 +29,56 @@ app.add_middleware(
 )
 
 
+# -----------------------------
+# Inquiry Data Model
+# -----------------------------
+class Inquiry(BaseModel):
+    name: str
+    phone: str
+    email: EmailStr
+    animal: str
+    purpose: str
+    visit_date: str
+    message: str
 
+
+# -----------------------------
+# Home API
+# -----------------------------
 @app.get("/")
 def home():
     return {
+        "status": "success",
         "message": "Welcome to Cattle Farm Management System API"
     }
 
 
+# -----------------------------
+# Create New Inquiry
+# -----------------------------
 @app.post("/inquiries")
 def create_inquiry(inquiry: Inquiry):
 
     inquiry_data = inquiry.model_dump()
 
-    inquiries_collection.insert_one(inquiry_data)
+    result = inquiries_collection.insert_one(inquiry_data)
 
     return {
         "status": "success",
-        "message": "Inquiry submitted successfully."
+        "message": "Inquiry submitted successfully.",
+        "id": str(result.inserted_id)
     }
 
 
+# -----------------------------
+# Get All Inquiries
+# -----------------------------
 @app.get("/inquiries")
 def get_inquiries():
 
     inquiries = []
 
-    for inquiry in inquiries_collection.find():
+    for inquiry in inquiries_collection.find().sort("_id", -1):
 
         inquiry["_id"] = str(inquiry["_id"])
 
@@ -62,21 +87,32 @@ def get_inquiries():
     return inquiries
 
 
+# -----------------------------
+# Delete Inquiry
+# -----------------------------
 @app.delete("/inquiries/{id}")
 def delete_inquiry(id: str):
 
-    result = inquiries_collection.delete_one(
-        {"_id": ObjectId(id)}
-    )
+    try:
 
-    if result.deleted_count == 1:
+        result = inquiries_collection.delete_one(
+            {"_id": ObjectId(id)}
+        )
+
+        if result.deleted_count == 1:
+            return {
+                "status": "success",
+                "message": "Inquiry deleted successfully."
+            }
+
         return {
-            "status": "success",
-            "message": "Inquiry deleted successfully."
+            "status": "failed",
+            "message": "Inquiry not found."
         }
 
-    return {
-        "status": "failed",
-        "message": "Inquiry not found."
-    }
+    except Exception:
 
+        return {
+            "status": "failed",
+            "message": "Invalid inquiry ID."
+        }
