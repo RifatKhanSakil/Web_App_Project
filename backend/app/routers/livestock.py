@@ -2,8 +2,7 @@ from fastapi import APIRouter, HTTPException, Query, status
 from typing import List, Optional
 from bson import ObjectId
 
-# Ensure database instance is imported
-from app.core.database import db 
+from app.core.database import db
 
 router = APIRouter(prefix="/animals", tags=["Animals"])
 
@@ -30,12 +29,19 @@ async def get_animals(
     category: Optional[str] = Query(
         None, 
         description="Filter animals by category (e.g., Cow, Goat)"
+    ),
+    is_featured: Optional[bool] = Query(
+        None,
+        description="Filter animals by featured status (True/False)"
     )
 ):
     query = {}
     
     if category:
         query["category"] = {"$regex": f"^{category}$", "$options": "i"}
+        
+    if is_featured is not None:
+        query["is_featured"] = is_featured
         
     animals = []
     cursor = db["animals"].find(query)
