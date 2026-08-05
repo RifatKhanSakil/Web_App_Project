@@ -8,6 +8,7 @@ from app.routers.faq import router as faq_router
 from app.routers.visiting_info import router as visiting_info_router
 from app.routers.livestock_weight import router as livestock_weight_router
 from app.routers.eid_sales import router as eid_sales_router
+from app.routers.qurbani_prep import router as qurbani_prep_router
 
 app = FastAPI(
     title="Cattle Farm Management API",
@@ -32,6 +33,7 @@ app.include_router(faq_router)
 app.include_router(visiting_info_router)
 app.include_router(livestock_weight_router)
 app.include_router(eid_sales_router)
+app.include_router(qurbani_prep_router)
 
 @app.get("/")
 def read_root():
