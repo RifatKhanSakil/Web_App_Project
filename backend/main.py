@@ -6,6 +6,7 @@ from app.routers.gallery import router as gallery_router
 from app.routers.contact import router as contact_router
 from app.routers.faq import router as faq_router
 from app.routers.visiting_info import router as visiting_info_router
+from app.routers.livestock_weight import router as livestock_weight_router
 
 app = FastAPI(
     title="Cattle Farm Management API",
@@ -28,6 +29,7 @@ app.include_router(gallery_router)
 app.include_router(contact_router)
 app.include_router(faq_router)
 app.include_router(visiting_info_router)
+app.include_router(livestock_weight_router)
 
 @app.get("/")
 def read_root():
