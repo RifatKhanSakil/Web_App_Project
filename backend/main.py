@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers.inquiry import router as inquiry_router
 from app.routers.livestock import router as livestock_router
 from app.routers.gallery import router as gallery_router
+from app.routers.contact import router as contact_router
 
 app = FastAPI(
     title="Cattle Farm Management API",
@@ -22,7 +23,7 @@ app.add_middleware(
 app.include_router(inquiry_router)
 app.include_router(livestock_router)
 app.include_router(gallery_router)
-
+app.include_router(contact_router)
 
 @app.get("/")
 def read_root():
