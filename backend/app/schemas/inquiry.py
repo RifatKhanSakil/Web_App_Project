@@ -1,6 +1,6 @@
-from pydantic import BaseModel, EmailStr, Field
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 class InquiryCreate(BaseModel):
     name: str
@@ -12,5 +12,6 @@ class InquiryResponse(InquiryCreate):
     id: str
     created_at: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True
+    # Standard Pydantic V2 config (fixes the openapi.json 500 error)
+    model_config = ConfigDict(from_attributes=True)
+    
