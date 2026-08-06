@@ -9,5 +9,4 @@ class AvailabilityStatus(str, Enum):
 class AnimalUpdateStatus(BaseModel):
     availability_status: AvailabilityStatus
 
-# Explicitly rebuild schema so FastAPI / OpenAPI can evaluate it
 AnimalUpdateStatus.model_rebuild()

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from app.schemas.livestock import AnimalUpdateStatus
 from fastapi import APIRouter, HTTPException, Query, status
 from typing import List, Optional
