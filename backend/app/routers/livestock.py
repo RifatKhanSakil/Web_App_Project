@@ -1,3 +1,4 @@
+from app.schemas.livestock import AnimalUpdateStatus
 from fastapi import APIRouter, HTTPException, Query, status
 from typing import List, Optional
 from bson import ObjectId
