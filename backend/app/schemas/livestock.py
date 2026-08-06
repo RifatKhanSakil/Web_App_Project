@@ -8,3 +8,5 @@ class AvailabilityStatus(str, Enum):
 
 class AnimalUpdateStatus(BaseModel):
     availability_status: AvailabilityStatus
+
+AnimalUpdateStatus.model_rebuild()

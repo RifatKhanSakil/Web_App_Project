@@ -15,12 +15,12 @@ function App() {
   const [purpose, setPurpose] = useState("Purchase");
   const [visitDate, setVisitDate] = useState("");
   const [message, setMessage] = useState("");
-
+  const [inquiries, setInquiries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const [inquiries, setInquiries] = useState([]);
+  
 
   // Endpoints Data State
   const [eidBookingData, setEidBookingData] = useState(null);
@@ -29,15 +29,20 @@ function App() {
   // -----------------------------
   // Load Data Functions
   // -----------------------------
-  const loadInquiries = async () => {
-    try {
-      const response = await fetch(`${API_URL}/inquiry/`);
-      const data = await response.json();
-      setInquiries(data);
-    } catch (error) {
-      console.error("Error loading inquiries:", error);
+ const loadInquiries = async () => {
+  try {
+    const response = await fetch(`${API_URL}/inquiry/`);
+    if (!response.ok) {
+      setInquiries([]);
+      return;
     }
-  };
+    const data = await response.json();
+    setInquiries(Array.isArray(data) ? data : []);
+  } catch (error) {
+    console.error("Error loading inquiries:", error);
+    setInquiries([]);
+  }
+};
 
   const loadEidBooking = async () => {
     try {
@@ -253,15 +258,14 @@ function App() {
 
           <h2>Submitted Inquiries</h2>
 
-          {inquiries.length === 0 ? (
-            <p>No inquiries found.</p>
-          ) : (
-            inquiries.map((item) => (
-              <div className="card" key={item._id || item.id}>
-                <p><strong>Name:</strong> {item.name}</p>
-                <p><strong>Phone:</strong> {item.phone}</p>
-                <p><strong>Email:</strong> {item.email}</p>
-                <p><strong>Animal:</strong> {item.animal}</p>
+          {!Array.isArray(inquiries) || inquiries.length === 0 ? (
+              <p>No inquiries found.</p>
+            ) : (
+              inquiries.map((item) => (
+                <div className="card" key={item._id || item.id}>
+                  <p><strong>Name:</strong> {item.name}</p>
+                  <p><strong>Phone:</strong> {item.phone}</p>
+                  <p><strong>Email:</strong> {item.email}</p>
                 <p><strong>Purpose:</strong> {item.purpose}</p>
                 <p><strong>Visit Date:</strong> {item.visit_date}</p>
                 <p><strong>Message:</strong> {item.message}</p>
