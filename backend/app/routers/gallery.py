@@ -1,10 +1,10 @@
-from fastapi import APIRouter, HTTPException, status
-from typing import List
+from fastapi import APIRouter, status
+from typing import List, Dict
 from app.core.database import db
 
 router = APIRouter(prefix="/gallery", tags=["Gallery"])
 
-@router.get("/", response_model=List[dict], status_code=status.HTTP_200_OK)
+@router.get("/", response_model=List[Dict], status_code=status.HTTP_200_OK)
 async def get_gallery_images():
     images = []
     cursor = db["gallery"].find({})
@@ -14,4 +14,3 @@ async def get_gallery_images():
         images.append(image)
         
     return images
-    

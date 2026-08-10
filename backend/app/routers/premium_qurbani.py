@@ -7,7 +7,6 @@ router = APIRouter(prefix="/premium-qurbani", tags=["Premium Qurbani"])
 @router.get("/", response_model=List[Dict], status_code=status.HTTP_200_OK)
 async def get_premium_qurbani_animals():
     premium_animals = []
-    # Fetch livestock marked with category 'premium' or tagged as premium Qurbani
     cursor = db["animals"].find({"category": "premium"})
     
     async for item in cursor:

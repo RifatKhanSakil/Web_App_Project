@@ -1,12 +1,15 @@
-from enum import Enum
 from pydantic import BaseModel
+from typing import Optional
 
-class AvailabilityStatus(str, Enum):
-    AVAILABLE = "Available"
-    BOOKED = "Booked"
-    SOLD = "Sold"
+class LivestockBase(BaseModel):
+    tag_id: str
+    category: str  # "Cattle" or "Goat"
+    breed: str
+    weight_kg: float
+    price: float
+    health_status: str
+    is_available: bool = True
+    image_url: Optional[str] = None
 
-class AnimalUpdateStatus(BaseModel):
-    availability_status: AvailabilityStatus
-
-AnimalUpdateStatus.model_rebuild()
+class LivestockResponse(LivestockBase):
+    id: str

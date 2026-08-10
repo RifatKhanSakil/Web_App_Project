@@ -16,9 +16,9 @@ router = APIRouter(prefix="/about-us", tags=["About Us"])
 async def get_about_us_info():
     return {
         "title": "About Our Cattle Farm",
-        "mission": "Providing healthy livestock...",
+        "mission": "Providing healthy livestock with complete transparency and care.",
         "founded_year": 2020,
-        "location": "Dhaka, Bangladesh",
-        "core_values": ["Ethical Practices", "Transparency"],
-        "farm_facilities": ["Ventilated sheds", "Vet care"]
+        "location": "Gazipur, Bangladesh",
+        "core_values": ["Ethical Practices", "Transparency", "Animal Welfare"],
+        "farm_facilities": ["Ventilated sheds", "24/7 Vet care", "Hygienic feeding areas"]
     }

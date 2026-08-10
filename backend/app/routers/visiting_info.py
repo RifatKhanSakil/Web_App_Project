@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status
-from typing import Dict, List
+from typing import Dict
 
 router = APIRouter(prefix="/visiting-info", tags=["Visiting Info"])
 

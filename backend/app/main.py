@@ -1,0 +1,71 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+import os
+
+# Router imports
+from app.routers.auth import router as auth_router
+from app.routers.inquiry import router as inquiry_router
+from app.routers.livestock import router as livestock_router
+from app.routers.gallery import router as gallery_router
+from app.routers.contact import router as contact_router
+from app.routers.faq import router as faq_router
+from app.routers.visiting_info import router as visiting_info_router
+from app.routers.livestock_weight import router as livestock_weight_router
+from app.routers.eid_sales import router as eid_sales_router
+from app.routers.qurbani_prep import router as qurbani_prep_router
+from app.routers.premium_qurbani import router as premium_qurbani_router
+from app.routers.eid_booking import router as eid_booking_router
+from app.routers.about_us import router as about_us_router
+
+app = FastAPI(
+    title="Khan Agro API",
+    description="Livestock Management & Eid Booking REST API",
+    version="1.0.0",
+)
+
+# Ensure the uploads directory exists
+os.makedirs("static/uploads", exist_ok=True)
+
+# Mount the static directory to serve images publicly
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# CORS Middleware Setup
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Router Registrations with /api prefix
+app.include_router(auth_router, prefix="/api")
+app.include_router(inquiry_router, prefix="/api")
+app.include_router(livestock_router, prefix="/api")
+app.include_router(gallery_router, prefix="/api")
+app.include_router(contact_router, prefix="/api")
+app.include_router(faq_router, prefix="/api")
+app.include_router(visiting_info_router, prefix="/api")
+app.include_router(livestock_weight_router, prefix="/api")
+app.include_router(eid_sales_router, prefix="/api")
+app.include_router(qurbani_prep_router, prefix="/api")
+app.include_router(premium_qurbani_router, prefix="/api")
+app.include_router(eid_booking_router, prefix="/api")
+app.include_router(about_us_router, prefix="/api")
+
+# Health Check
+@app.get("/", tags=["Health Check"])
+def read_root():
+    return {
+        "status": "online",
+        "message": "Khan Agro API is running smoothly"
+    }
