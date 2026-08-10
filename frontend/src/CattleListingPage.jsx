@@ -1,104 +1,101 @@
-import React, { useState, useEffect } from "react";
-import { getLivestock } from "./api"; // adjust path to match your api.js
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { getAnimals, deleteAnimal, getCurrentUser } from './api';
 
-export default function CattleListingPage({ onSelectAnimal }) {
-  const [cattle, setCattle] = useState([]);
+const CattleListingPage = () => {
+  const [cattleList, setCattleList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [error, setError] = useState(null);
+
+  // Retrieve current logged in user
+  const currentUser = getCurrentUser();
 
   useEffect(() => {
-    async function fetchCattle() {
-      try {
-        setLoading(true);
-        // Fetch all livestock and filter for cattle
-        const data = await getLivestock();
-        const cattleList = Array.isArray(data)
-          ? data.filter((item) => item.category?.toLowerCase() === "cattle" || item.type?.toLowerCase() === "cattle" || item.species?.toLowerCase() === "cattle")
-          : [];
-        setCattle(cattleList);
-      } catch (error) {
-        console.error("Failed to fetch cattle data:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchCattle();
+    // Pass the category parameter to filter backend side
+    getAnimals("cow")
+      .then((data) => {
+        const list = Array.isArray(data) ? data : [];
+        setCattleList(list);
+      })
+      .catch((err) => {
+        console.error("Failed to load cattle listings:", err);
+        setError("Unable to connect to server. Please try again later.");
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  const filteredCattle = cattle.filter((item) => {
-    const matchesSearch =
-      item.tag_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.breed?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.title?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "all" ||
-      item.status?.toLowerCase() === statusFilter.toLowerCase();
-
-    return matchesSearch && matchesStatus;
-  });
+  // Admin Delete Handler
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this listing?")) return;
+    try {
+      await deleteAnimal(id);
+      // Remove deleted animal from local UI state instantly
+      setCattleList((prevList) => prevList.filter((item) => item.id !== id));
+    } catch (err) {
+      alert(err.message || "Failed to delete listing");
+    }
+  };
 
   return (
-    <div className="listing-page-container">
-      <div className="listing-header">
-        <h1>Cattle Collection</h1>
-        <p>Explore our premium bulls, cows, and calves with verified weight and health logs.</p>
+    <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="mb-8">
+        <h1 className="text-3xl font-extrabold text-gray-900">Cows & Bulls Collection</h1>
+        <p className="text-gray-600 mt-2">Explore organic Deshi, Brahma, and Shahiwal cattle.</p>
       </div>
 
-      {/* Search and Filters */}
-      <div className="filter-bar">
-        <input
-          type="text"
-          placeholder="Search by Tag ID or Breed..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="search-input"
-        />
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="filter-select"
-        >
-          <option value="all">All Statuses</option>
-          <option value="available">Available</option>
-          <option value="booked">Booked</option>
-          <option value="sold">Sold</option>
-        </select>
-      </div>
-
-      {/* Grid Display */}
       {loading ? (
-        <div className="loading-spinner">Loading cattle records...</div>
-      ) : filteredCattle.length === 0 ? (
-        <div className="no-results">No cattle found matching your criteria.</div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((n) => (
+            <div key={n} className="bg-white border p-4 rounded-xl animate-pulse space-y-3">
+              <div className="h-48 bg-gray-200 rounded-lg"></div>
+              <div className="h-5 bg-gray-200 rounded w-2/3"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          ))}
+        </div>
+      ) : error ? (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          {error}
+        </div>
+      ) : cattleList.length === 0 ? (
+        <p className="text-gray-500 italic">No cattle available at the moment.</p>
       ) : (
-        <div className="livestock-grid">
-          {filteredCattle.map((item) => (
-            <div key={item._id || item.tag_id} className="livestock-card">
-              <div className="card-image-wrapper">
-                <img
-                  src={item.image_url || "https://images.unsplash.com/photo-1546445317-29f4545f9d52?auto=format&fit=crop&w=800&q=80"}
-                  alt={item.title || `Cattle ${item.tag_id}`}
-                  className="card-img"
-                />
-                <span className={`status-badge status-${item.status?.toLowerCase() || "available"}`}>
-                  {item.status || "Available"}
-                </span>
-              </div>
-              <div className="card-body">
-                <h3>{item.title || `Tag: ${item.tag_id}`}</h3>
-                <p className="breed-info"><strong>Breed:</strong> {item.breed || "Standard"}</p>
-                <div className="card-details">
-                  <span><strong>Weight:</strong> {item.weight ? `${item.weight} kg` : "N/A"}</span>
-                  <span><strong>Price:</strong> {item.price ? `$${item.price}` : "Contact for Price"}</span>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {cattleList.map((animal) => (
+            <div key={animal.id} className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden flex flex-col hover:shadow-md transition">
+              <img 
+                src={animal.image_url || animal.image || 'https://via.placeholder.com/400x300?text=Cattle'} 
+                alt={animal.title || animal.name} 
+                className="w-full h-48 object-contain bg-stone-50"
+              />
+              <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                <div>
+                  <h2 className="text-lg font-bold text-gray-900">{animal.title || animal.name || animal.tag_number || "Cattle"}</h2>
+                  <p className="text-sm text-gray-600 mt-1">Weight: {animal.weight ? `${animal.weight} kg` : 'N/A'}</p>
+                  <p className="text-sm font-semibold text-[#1B3B2B] mt-1">
+                    Price: ৳{animal.price ? animal.price.toLocaleString() : 'Contact for Price'}
+                  </p>
                 </div>
-                <button
-                  className="btn btn-outline"
-                  onClick={() => onSelectAnimal && onSelectAnimal(item._id || item.tag_id)}
-                >
-                  View Details &rarr;
-                </button>
+
+                <div className="space-y-2">
+                  <Link
+                    to={`/animal/${animal.id}`}
+                    className="block text-center py-2 px-4 bg-[#1B3B2B] text-white text-sm font-semibold rounded-lg hover:bg-opacity-90 transition"
+                  >
+                    View Details
+                  </Link>
+
+                  {/* ADMIN-ONLY DELETE BUTTON */}
+                  {currentUser?.role === "admin" && (
+                    <button
+                      onClick={() => handleDelete(animal.id)}
+                      className="w-full py-2 px-4 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition cursor-pointer"
+                    >
+                      Delete Animal (Admin)
+                    </button>
+                  )}
+                </div>
+
               </div>
             </div>
           ))}
@@ -106,4 +103,6 @@ export default function CattleListingPage({ onSelectAnimal }) {
       )}
     </div>
   );
-}
+};
+
+export default CattleListingPage;

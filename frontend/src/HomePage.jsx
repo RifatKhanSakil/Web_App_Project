@@ -1,67 +1,48 @@
-import React from "react";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import FarmInfoSection from './FarmInfoSection';
 
-export default function HomePage({ setActivePage }) {
+export default function HomePage() {
+  const navigate = useNavigate();
+
   return (
-    <div className="homepage-container">
-      {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-content">
-          <h1 className="hero-title">Premium Cattle & Goat Farm</h1>
-          <p className="hero-subtitle">
-            Providing healthy, ethically raised livestock for daily needs, breeding, and Qurbani / Eid sales.
+    <div className="bg-[#FBF8F3] text-[#1B3B2B]">
+      
+      {/* Hero Banner Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 text-center">
+        <div className="max-w-3xl mx-auto">
+          <span className="text-xs font-semibold px-3.5 py-1.5 bg-emerald-100 text-[#1B3B2B] rounded-full uppercase tracking-wider mb-4 inline-block">
+            Ethically Raised Livestock
+          </span>
+          <h1 className="text-4xl sm:text-6xl font-serif font-bold text-[#1B3B2B] leading-tight mt-2">
+            Premium Ethically Raised Livestock
+          </h1>
+          <p className="text-stone-600 text-sm sm:text-base leading-relaxed mt-6 mb-8 max-w-2xl mx-auto">
+            Welcome to KHAN AGRO. Explore organic Deshi, Brahma, and Shahiwal cattle, along with healthy Beetal and Barbari goats for dairy, farming, and Qurbani requirements.
           </p>
-          <div className="hero-actions">
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button
-              className="btn btn-primary"
-              onClick={() => setActivePage("cattle")}
+              onClick={() => navigate('/cattle')}
+              className="w-full sm:w-auto px-6 py-3.5 bg-[#1B3B2B] hover:bg-[#142d21] text-white text-xs font-semibold rounded-xl transition shadow-sm cursor-pointer"
             >
-              Browse Cattle
+              Browse Cow Collection &rarr;
             </button>
             <button
-              className="btn btn-secondary"
-              onClick={() => setActivePage("eid-booking")}
+              onClick={() => navigate('/goats')}
+              className="w-full sm:w-auto px-6 py-3.5 bg-stone-200 hover:bg-stone-300 text-[#1B3B2B] text-xs font-semibold rounded-xl transition cursor-pointer"
             >
-              Eid Booking Info
+              Browse Goat Collection &rarr;
             </button>
           </div>
         </div>
       </section>
 
-      {/* Featured Livestock Categories */}
-      <section className="featured-section">
-        <h2 className="section-title">Our Featured Categories</h2>
-        <div className="category-grid">
-          <div
-            className="category-card"
-            onClick={() => setActivePage("cattle")}
-          >
-            <div className="card-icon">🐂</div>
-            <h3>Cattle</h3>
-            <p>Explore high-quality bulls, cows, and calves with verified weight logs and health status.</p>
-            <span className="card-link">View Cattle &rarr;</span>
-          </div>
-
-          <div
-            className="category-card"
-            onClick={() => setActivePage("goat")}
-          >
-            <div className="card-icon">🐐</div>
-            <h3>Goats</h3>
-            <p>Browse our collection of healthy goats carefully raised for breeding and sacrificed events.</p>
-            <span className="card-link">View Goats &rarr;</span>
-          </div>
-
-          <div
-            className="category-card"
-            onClick={() => setActivePage("eid-booking")}
-          >
-            <div className="card-icon">🌙</div>
-            <h3>Qurbani & Eid Sales</h3>
-            <p>Reserve your animal in advance with clear booking rules, advance payments, and date schedules.</p>
-            <span className="card-link">Booking Details &rarr;</span>
-          </div>
-        </div>
+      {/* Farm Information Component Section */}
+      <section className="border-t border-stone-200/60 bg-white py-12">
+        <FarmInfoSection />
       </section>
+
     </div>
   );
 }
