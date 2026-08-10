@@ -56,7 +56,7 @@ def delete_booking(booking_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# ================= INQUIRIES ROUTES =================
+# ================= INQUIRIES ROUTES =================#
 
 @router.post("/inquiries", status_code=status.HTTP_201_CREATED)
 def create_inquiry(inquiry: InquiryCreate):
