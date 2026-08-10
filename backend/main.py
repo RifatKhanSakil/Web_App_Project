@@ -1,46 +1,116 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers.inquiry import router as inquiry_router
-from app.routers.livestock import router as livestock_router
-from app.routers.gallery import router as gallery_router
-from app.routers.contact import router as contact_router
-from app.routers.faq import router as faq_router
-from app.routers.visiting_info import router as visiting_info_router
-from app.routers.livestock_weight import router as livestock_weight_router
-from app.routers.eid_sales import router as eid_sales_router
-from app.routers.qurbani_prep import router as qurbani_prep_router
-from app.routers.premium_qurbani import router as premium_qurbani_router
-from app.routers.eid_booking import router as eid_booking_router
-from app.routers.about_us import router as about_us_router
+from pydantic import BaseModel, EmailStr
+from bson import ObjectId
+from database import inquiries_collection
 
 app = FastAPI(
-    title="Cattle Farm Management API",
-    description="Farm Visit & Animal Inquiry REST API",
-    version="1.0.0",
+    title="Cattle Farm Management System API",
+    version="1.0.0"
 )
 
+# Allow React Frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include the modular inquiry router
-app.include_router(inquiry_router)
-app.include_router(livestock_router)
-app.include_router(gallery_router)
-app.include_router(contact_router)
-app.include_router(faq_router)
-app.include_router(visiting_info_router)
-app.include_router(livestock_weight_router)
-app.include_router(eid_sales_router)
-app.include_router(qurbani_prep_router)
-app.include_router(premium_qurbani_router)
-app.include_router(eid_booking_router)
-app.include_router(about_us_router)
+
+# ==========================
+# Inquiry Model
+# ==========================
+
+class Inquiry(BaseModel):
+    name: str
+    phone: str
+    email: EmailStr
+    animal: str
+    purpose: str
+    visit_date: str
+    message: str
+
+
+# ==========================
+# Home Route
+# ==========================
 
 @app.get("/")
-def read_root():
-    return {"status": "online", "message": "Cattle Farm Management API is running"}
+def home():
+    return {
+        "status": "success",
+        "message": "Welcome to Cattle Farm Management System API"
+    }
+
+
+# ==========================
+# Create Inquiry
+# ==========================
+
+@app.post("/inquiries")
+def create_inquiry(inquiry: Inquiry):
+
+    inquiry_data = inquiry.model_dump()
+
+    result = inquiries_collection.insert_one(inquiry_data)
+
+    return {
+        "status": "success",
+        "message": "Inquiry submitted successfully.",
+        "id": str(result.inserted_id)
+    }
+
+
+# ==========================
+# Get All Inquiries
+# ==========================
+
+@app.get("/inquiries")
+def get_inquiries():
+
+    inquiries = []
+
+    for inquiry in inquiries_collection.find():
+
+        inquiry["_id"] = str(inquiry["_id"])
+
+        inquiries.append(inquiry)
+
+    return inquiries
+
+
+# ==========================
+# Delete Inquiry
+# ==========================
+
+@app.delete("/inquiries/{id}")
+def delete_inquiry(id: str):
+
+    try:
+
+        result = inquiries_collection.delete_one(
+            {"_id": ObjectId(id)}
+        )
+
+        if result.deleted_count == 1:
+
+            return {
+                "status": "success",
+                "message": "Inquiry deleted successfully."
+            }
+
+        return {
+            "status": "failed",
+            "message": "Inquiry not found."
+        }
+
+    except Exception:
+
+        return {
+            "status": "failed",
+            "message": "Invalid inquiry ID."
+        }
